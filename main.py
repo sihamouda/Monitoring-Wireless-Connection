@@ -65,5 +65,26 @@ def networks_List(data):
     
     return(networks)
 
-#print(show_network())
-pp(networks_List(show_network()))
+def detect_best_network():
+    signal=0
+    SSID=''
+    for network in networks_List(show_network()):
+        s = int(network['SIGNAL'])
+        if s > signal:
+            signal=s
+            SSID=network['SSID']
+
+    SSID="\ ".join(SSID.split())
+    return SSID
+
+def connect_network(SSID):
+    cmd="nmcli device wifi connect "+SSID
+    print(cmd)
+    p = subprocess.Popen(cmd,shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out = p.stdout.read().decode()
+    err = p.stderr.read().decode()
+    print(out)
+    print(err)
+
+#detect_best_network()
+connect_network(detect_best_network())
