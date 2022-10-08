@@ -2,9 +2,10 @@ import subprocess
 #import re
 import time
 import datetime
-#import platform
+import platform
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from pprint import  pprint as pp
 #import numpy as np
 
 def get_Signal_Power(data):
@@ -16,8 +17,8 @@ def read_data_from_cmd():
     out = p.stdout.read().decode()
     return(out)
 
-curtime,sp=[], []
-data=read_data_from_cmd()
+#curtime,sp=[], []
+#data=read_data_from_cmd()
 
 def show_Signal_Power(i):    
     curtime.append(datetime.datetime.now())
@@ -26,8 +27,43 @@ def show_Signal_Power(i):
     plt.cla()
     plt.plot(curtime,sp)
 
+#animate = FuncAnimation(plt.gcf(),show_Signal_Power,interval=1000)
+#plt.tight_layout()
+#plt.show()
 
+def show_network():
+    cmd = "nmcli device wifi"
+    p = subprocess.Popen(cmd,shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out = p.stdout.read().decode()
+    return out
 
-animate = FuncAnimation(plt.gcf(),show_Signal_Power,interval=1000)
-plt.tight_layout()
-plt.show()
+def networks_List(data):    
+    names=data.splitlines()[0].split()
+    networks=[]
+    
+    for line in data.splitlines()[1:]:
+        if line.split()[0] != '*':
+            newLine=['False']+line.split()
+        else:
+            newLine=['True']+line.split()[1:] 
+        
+        if newLine.index('Infra') != 3:
+            SSID=' '.join(newLine[2:newLine.index('Infra')])
+            newLine[2]=SSID
+            del newLine[3:newLine.index('Infra')]
+        
+        RATE=' '.join(newLine[5:7])
+        newLine[5]=RATE
+        del newLine[6]
+
+        if len(newLine) > 9:
+            SECURITY=' '.join(newLine[8:])
+            newLine[8]=SECURITY
+            del newLine[9:]
+        
+        networks.append(dict(zip(names,newLine)))
+    
+    return(networks)
+
+#print(show_network())
+pp(networks_List(show_network()))
