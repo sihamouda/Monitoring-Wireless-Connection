@@ -37,11 +37,33 @@ def plot_puissance(puissance):
 	plt.show()
 
 def show_networks():
-	network={}
+	networks={}
 	p = subprocess.Popen("netsh wlan show networks", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	out = p.stdout.read().decode('unicode_escape').strip()
 	print(out)
-	m = re.findall('SSID.*?:.*?([A-z0-9 ]*)', out, re.DOTALL)
+	m = re.findall('SSID.*?:.*?([A-z-0-9 ]*)', out, re.DOTALL)
 	print(m)
+	for network in m:
+		p = subprocess.Popen("netsh wlan connect name="+network.strip() , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		res = p.stdout.read().decode('unicode_escape').strip()
+		if "La demande de connexion a" in res:
+			time.sleep(10)
+			p = subprocess.Popen("netsh wlan show interfaces", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			out = p.stdout.read().decode('unicode_escape').strip()
+			# print(out)
+			if platform.system() == 'Linux':
+				signal = re.findall('(wlan[0-9]+).*?Signal level=(-[0-9]+) dBm', out, re.DOTALL)
+			elif platform.system() == 'Windows':
+				signal = re.findall('Nom.*?:.*?([A-z0-9 ]*).*?Signal.*?:.*?([0-9]*)%', out, re.DOTALL)
+			else:
+				raise Exception('reached else of if statement')
+			print(signal)
+			networks[network]=int(str(signal[0]).lstrip('(').rstrip(')').split(',')[1].replace("\'", ""))
+			# networks[network]=int(str(signal[0]).lstrip('(').rstrip(')').split(',')[1].replace("\'",""))
+		else:
+			print("Pas de mdp pour"+network)
+	print(networks)
+	best=max(networks, key=networks.get)
+	p = subprocess.Popen("netsh wlan connect name="+best.strip() , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 show_networks()
