@@ -1,5 +1,5 @@
 import subprocess
-
+from itertools import count
 # import re
 import time
 import datetime
@@ -22,21 +22,27 @@ def read_data_from_cmd():
     return out
 
 
-# curtime,sp=[], []
-# data=read_data_from_cmd()
-
+curtime=[]
+sp=[]
+ 
+index = count()
 
 def show_Signal_Power(i):
-    curtime.append(datetime.datetime.now())
-    sp.append(data[get_Signal_Power(data) + 13 : get_Signal_Power(data) + 16])
-
+    
+    plt.style.use("fivethirtyeight")
+    data=read_data_from_cmd()
+    s=int(data[get_Signal_Power(data) + 13 : get_Signal_Power(data) + 16])
+    curtime.append(next(index))
+    sp.append(s)
+    #sp.sort(r)
+    pp(sp)
     plt.cla()
     plt.plot(curtime, sp)
 
 
-# animate = FuncAnimation(plt.gcf(),show_Signal_Power,interval=1000)
-# plt.tight_layout()
-# plt.show()
+animate = FuncAnimation(plt.gcf(),show_Signal_Power,interval=1000)
+plt.tight_layout()
+plt.show()
 
 
 def show_network():
@@ -103,4 +109,4 @@ def connect_network(SSID):
 
 
 # detect_best_network()
-connect_network(detect_best_network())
+#connect_network(detect_best_network())
