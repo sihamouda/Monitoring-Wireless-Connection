@@ -1,81 +1,81 @@
+# To pass shell commands we use subprocess
 import subprocess
-from itertools import count
-# import re
-import time
-import datetime
-import platform
+
+# To parse data using regular expressions we use re
+import re
+
+# To make a graph of the current AP' signal power
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+
+# To get date and time
+import datetime
+
+# To print list in a nice way: mainly for testing
 from pprint import pprint as pp
 
-# import numpy as np
 
-
-def get_Signal_Power(data):
-    i = int(data.find("Signal level="))
-    return i
-
-
-def read_data_from_cmd():
-    p = subprocess.Popen("iwconfig", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out = p.stdout.read().decode()
-    return out
-
-
-curtime=[]
-sp=[]
- 
-index = count()
-
-def show_Signal_Power(i):
-    
-    plt.style.use("fivethirtyeight")
-    data=read_data_from_cmd()
-    s=int(data[get_Signal_Power(data) + 13 : get_Signal_Power(data) + 16])
-    curtime.append(next(index))
-    sp.append(s)
-    #sp.sort(r)
-    pp(sp)
-    plt.cla()
-    plt.plot(curtime, sp)
-
-
-animate = FuncAnimation(plt.gcf(),show_Signal_Power,interval=1000)
-plt.tight_layout()
-plt.show()
-
-
-def show_network():
-    cmd = "nmcli device wifi"
+# This function will return the output of a Linux command as a string using subprocess
+def read_data_from_shell(cmd):
     p = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     out = p.stdout.read().decode()
-    return out
+    err = p.stderr.read().decode()
+    return out, err
 
 
-def networks_List(data):
-    names = data.splitlines()[0].split()
+# This function will parse the result of a Linux command using regular expressions
+# We will used it specifically to get the signal power in dBm
+def get_signal_power(cmd_result):
+    signal_power = re.findall("Signal level=(-[0-9]+) dBm", cmd_result, re.DOTALL)
+    sp_int = int(signal_power[0])
+    return sp_int
+
+
+# This function will show us a real time graph of the current AP' signal power in dBm
+def wifi_statistics():
+    current_time = []
+    signal_power = []
+
+    def show_signal_power(i):
+        plt.style.use("fivethirtyeight")
+        current_time.append(datetime.datetime.now())
+        signal_power.append(get_signal_power(read_data_from_shell("iwconfig")[0]))
+
+        # pp(signal_power)
+        plt.cla()
+        plt.plot(current_time, signal_power)
+
+    animate = FuncAnimation(plt.gcf(), show_signal_power, interval=1000)
+    plt.tight_layout()
+    plt.show()
+
+
+# This function is used to convert the available networks table to list of dictonaries
+def get_networks(cmd_result):
+    cmd_result_list = cmd_result.splitlines()
+    names = cmd_result_list[0].split()
     networks = []
 
-    for line in data.splitlines()[1:]:
+    for line in cmd_result_list[1:]:
         if line.split()[0] != "*":
             newLine = ["False"] + line.split()
         else:
             newLine = ["True"] + line.split()[1:]
 
         if newLine.index("Infra") != 3:
-            SSID = " ".join(newLine[2 : newLine.index("Infra")])
-            newLine[2] = SSID
+            ssid = " ".join(newLine[2 : newLine.index("Infra")])
+            newLine[2] = ssid
             del newLine[3 : newLine.index("Infra")]
 
-        RATE = " ".join(newLine[5:7])
-        newLine[5] = RATE
+        rate = " ".join(newLine[5:7])
+        newLine[5] = rate
         del newLine[6]
 
         if len(newLine) > 9:
-            SECURITY = " ".join(newLine[8:])
-            newLine[8] = SECURITY
+            security = " ".join(newLine[8:])
+            newLine[8] = security
             del newLine[9:]
 
         networks.append(dict(zip(names, newLine)))
@@ -83,30 +83,26 @@ def networks_List(data):
     return networks
 
 
+# This function will detect the best available network
 def detect_best_network():
     signal = 0
-    SSID = ""
-    for network in networks_List(show_network()):
+    ssid = ""
+    cmd = "nmcli device wifi"
+
+    networks = get_networks(read_data_from_shell(cmd)[0])
+
+    for network in networks:
         s = int(network["SIGNAL"])
         if s > signal:
             signal = s
-            SSID = network["SSID"]
+            ssid = network["SSID"]
 
-    SSID = "\ ".join(SSID.split())
-    return SSID
-
-
-def connect_network(SSID):
-    cmd = "nmcli device wifi connect " + SSID
-    print(cmd)
-    p = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    out = p.stdout.read().decode()
-    err = p.stderr.read().decode()
-    print(out)
-    print(err)
+    return ssid
 
 
-# detect_best_network()
-#connect_network(detect_best_network())
+# This function will connect to a network with given SSID
+def connect_network(ssid):
+    ssid = "\ ".join(ssid.split())
+    cmd = "nmcli device wifi connect " + ssid
+
+    read_data_from_shell(cmd)[0]
