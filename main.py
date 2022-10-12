@@ -102,7 +102,14 @@ def detect_best_network():
 
 # This function will connect to a network with given SSID
 def connect_network(ssid):
-    ssid = "\ ".join(ssid.split())
-    cmd = "nmcli device wifi connect " + ssid
-
-    read_data_from_shell(cmd)[0]
+    ssid_cmd = "\ ".join(ssid.split())
+    cmd = "nmcli device wifi connect " + ssid_cmd
+    
+    result=read_data_from_shell(cmd)
+    
+    if result[0] == '':
+        cmd = "notify-send 'error while connecting'"
+        subprocess.Popen(cmd, shell=True)
+    else:
+        cmd = "notify-send 'connected to "+ ssid +"'"
+        subprocess.Popen(cmd, shell=True)
