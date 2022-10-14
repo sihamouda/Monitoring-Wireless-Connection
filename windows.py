@@ -15,7 +15,7 @@ import datetime
 from pprint import pprint as pp
 
 
-# This function will return the output of a Linux command as a string using subprocess
+# This function will return the output of a Windows command as a string using subprocess
 def read_data_from_cmd(cmd):
     p = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -26,19 +26,21 @@ def read_data_from_cmd(cmd):
 
 
 
-# This function will parse the result of a Linux command using regular expressions
-# We will used it specifically to get the signal power in dBm
+# This function will parse the result of a Windows command using regular expressions
+# We will used it specifically to get the signal power in %
 def get_signal_power(cmd_result):
     signal_power = re.findall("Signal.*?:.*?([0-9]*)%", cmd_result, re.DOTALL)
     return signal_power
 #print(get_signal_power(read_data_from_cmd('netsh wlan show interfaces')[0]))
 
+# This function will parse the result of a Windows command using regular expressions
+# We will used it specifically to get the ssid
 def get_ssid(cmd_result):
     result=re.findall('SSID.*?ÿ:.*?([A-z0-9- ]*)',cmd_result,re.DOTALL)
     return result
 
 
-# This function will show us a real time graph of the current AP' signal power in dBm
+# This function will show us a real time graph of the current AP' signal power in %
 def wifi_statistics():
     current_time = []
     signal_power = []
@@ -61,6 +63,7 @@ def wifi_statistics():
 
 #read_data_from_cmd("netsh wlan show networks mode=Bssid")[0]
 
+#This function will return available networks in a list of dicts
 def get_networks():
     cmd_result = read_data_from_cmd("netsh wlan show networks mode=Bssid")[0]
     ssids=get_ssid(cmd_result)
@@ -78,7 +81,7 @@ def get_networks():
     print(networks)
     return networks
 
-
+#this function will detect best network
 def detect_best_network():
     signal = 0
     ssid = ""
