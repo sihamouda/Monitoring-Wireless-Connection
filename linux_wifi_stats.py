@@ -16,14 +16,22 @@ def wifi_statistics():
     def show_signal_power(i):
         plt.style.use("fivethirtyeight")
         current_time.append(datetime.datetime.now())
-        signal_power.append(tools.get_signal_power(tools.read_data_from_shell("iwconfig")[0]))
+        signal_power.append(
+            tools.get_signal_power(tools.read_data_from_shell("iwconfig")[0])
+        )
 
         # pp(signal_power)
         plt.cla()
+
         plt.plot(current_time, signal_power)
+
+        plt.xlabel("xlabel")
+        plt.ylabel("ylabel")
 
     animate = FuncAnimation(plt.gcf(), show_signal_power, interval=1000)
     plt.tight_layout()
     plt.show()
 
-wifi_statistics()
+
+if __name__ == "__main__":
+    wifi_statistics()
