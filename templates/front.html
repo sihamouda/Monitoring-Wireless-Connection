@@ -4,27 +4,64 @@
     <meta charset="UTF-8" />
     <title>Synchronized Slider</title>
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
     />
-    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
   </head>
-  <body>
+  <body class="container">
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
       integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
       crossorigin="anonymous"
     ></script>
+
     <script type="text/javascript" charset="utf-8">
-      var socket = io();
-      socket.on("connect", function () {
-        socket.on("connection", (...args) => {
-          console.log(...args);
+      async function results() {
+        var socket = io();
+        socket.on("connect", function () {
+          socket.on("connection", (data) => {
+            console.log(data);
+
+            const body = document.getElementById("tablebody");
+            body.innerHTML = "";
+
+            var connected;
+            for (let i = 0; i < data.length; i++) {
+              connected = "";
+              if (data[i]["IN-USE"] == "True") {
+                connected = "connected";
+              }
+              body.innerHTML += `<tr><th scope="row">${1 + i}</th>
+            <td>${data[i]["SSID"]}</td>
+            <td>${connected}</td>
+            <td>${data[i]["SIGNAL"]}  ${data[i]["BARS"]}</td>
+            <td>${data[i]["RATE"]}</td>
+            <td>${data[i]["SECURITY"]}</td></tr>
+            `;
+            }
+          });
         });
-      });
+      }
     </script>
 
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">SSID</th>
+          <th scope="col">In Use</th>
+          <th scope="col">Signal Power</th>
+          <th scope="col">Rate</th>
+          <th scope="col">Security</th>
+        </tr>
+      </thead>
+      <tbody id="tablebody"></tbody>
+    </table>
+    <script>
+      setInterval(results, 2000);
+    </script>
     <div class="container text-center"></div>
   </body>
 </html>
