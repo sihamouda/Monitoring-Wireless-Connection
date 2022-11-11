@@ -18,7 +18,7 @@
     ></script>
 
     <script type="text/javascript" charset="utf-8">
-      async function results() {
+      function results() {
         var socket = io();
         socket.on("connect", function () {
           socket.on("connection", (data) => {
@@ -60,8 +60,7 @@
       <tbody id="tablebody"></tbody>
     </table>
     <script>
-      // setInterval(results, 2000);
-      results();
+      setInterval(results, 2000);
     </script>
     <div class="container text-center"></div>
   </body>

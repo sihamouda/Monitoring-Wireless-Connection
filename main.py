@@ -3,6 +3,10 @@ from flask_socketio import SocketIO, emit
 
 import time
 
+import sys
+
+sys.path.insert(0, "./modules")
+
 from linux_autoconnect import get_networks, connect_network, detect_best_network
 import linux_common_tools as tools
 from linux_wifi_stats import wifi_statistics
@@ -23,6 +27,7 @@ def index():
 @socketio.on("connect")
 def test_connect():
     cmd = "nmcli device wifi"
+
     networks = get_networks(tools.read_data_from_shell(cmd)[0])
     emit("connection", networks)
 
