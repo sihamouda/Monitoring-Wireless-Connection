@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Synchronized Slider</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+  </head>
+  <body>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript" charset="utf-8">
+      var socket = io();
+      socket.on("connect", function () {
+        socket.on("connection", (...args) => {
+          console.log(...args);
+        });
+      });
+    </script>
+
+    <div class="container text-center"></div>
+  </body>
+</html>
