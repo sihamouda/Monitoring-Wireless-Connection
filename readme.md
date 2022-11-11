@@ -2,7 +2,7 @@
 
 This was a class project where we are supposed to write some simple python modules that looks for the best access point, connect to AP and view some stats
 
-All modules works perfectly for Linux
+All modules work perfectly for Linux
 
 The Dashboard was made from Flask using Socket.io (websocket) to send data from the Back-End to the Web Interface.(Neither Flask or Socket was required )
 
