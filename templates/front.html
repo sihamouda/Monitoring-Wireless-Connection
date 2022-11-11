@@ -16,9 +16,21 @@
       integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
       crossorigin="anonymous"
     ></script>
-
-    <script type="text/javascript" charset="utf-8">
-      function results() {
+    <div class="container text-center">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">SSID</th>
+            <th scope="col">In Use</th>
+            <th scope="col">Signal Power</th>
+            <th scope="col">Rate</th>
+            <th scope="col">Security</th>
+          </tr>
+        </thead>
+        <tbody id="tablebody"></tbody>
+      </table>
+      <script type="text/javascript" charset="utf-8">
         var socket = io();
         socket.on("connect", function () {
           socket.on("connection", (data) => {
@@ -34,34 +46,16 @@
                 connected = "connected";
               }
               body.innerHTML += `<tr><th scope="row">${1 + i}</th>
-            <td>${data[i]["SSID"]}</td>
-            <td>${connected}</td>
-            <td>${data[i]["SIGNAL"]}  ${data[i]["BARS"]}</td>
-            <td>${data[i]["RATE"]}</td>
-            <td>${data[i]["SECURITY"]}</td></tr>
-            `;
+          <td>${data[i]["SSID"]}</td>
+          <td>${connected}</td>
+          <td>${data[i]["SIGNAL"]}  ${data[i]["BARS"]}</td>
+          <td>${data[i]["RATE"]}</td>
+          <td>${data[i]["SECURITY"]}</td></tr>
+          `;
             }
           });
         });
-      }
-    </script>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">SSID</th>
-          <th scope="col">In Use</th>
-          <th scope="col">Signal Power</th>
-          <th scope="col">Rate</th>
-          <th scope="col">Security</th>
-        </tr>
-      </thead>
-      <tbody id="tablebody"></tbody>
-    </table>
-    <script>
-      setInterval(results, 2000);
-    </script>
-    <div class="container text-center"></div>
+      </script>
+    </div>
   </body>
 </html>
