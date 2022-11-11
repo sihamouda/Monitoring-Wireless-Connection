@@ -14,17 +14,19 @@ socketio = SocketIO(app)
 
 # Handler for default flask route
 # Using jinja template to render html along with slider value as input
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('front.html')
+    return render_template("front.html")
+
 
 # Handler for a message recieved over 'connect' channel
-@socketio.on('connect')
+@socketio.on("connect")
 def test_connect():
     cmd = "nmcli device wifi"
     networks = get_networks(tools.read_data_from_shell(cmd)[0])
-    emit('connection',  networks)
+    emit("connection", networks)
+
 
 # Notice how socketio.run takes care of app instantiation as well.
-if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0')
+if __name__ == "__main__":
+    socketio.run(app, host="0.0.0.0")

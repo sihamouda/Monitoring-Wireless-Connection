@@ -13,9 +13,10 @@ async def send_data():
 
     cmd = "nmcli device wifi"
     networks = get_networks(tools.read_data_from_shell(cmd)[0])
-    
+
     async with websockets.connect(uri) as websocket:
         await websocket.send(json.dumps(networks))
+
 
 if __name__ == "__main__":
     asyncio.run(send_data())
