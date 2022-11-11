@@ -4,7 +4,7 @@ This was a class project where we are supposed to write some simple python modul
 
 All modules works perfectly for Linux
 
-The Dashboard was made from Flask using Socket.io (websocket) to send data from the Back-End to the Web Interface
+The Dashboard was made from Flask using Socket.io (websocket) to send data from the Back-End to the Web Interface.(Neither Flask or Socket was required )
 
 It's my first time to use Flask and Socket.io
 
